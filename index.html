@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Statistics Calculator</h1>
+        <input type="text" id="data-input" placeholder="Enter numbers separated by commas" />
+        <button id="calculate-button">Calculate</button>
+        <div id="results"></div>
+    </div>
+    <script >
+document.getElementById("calculate-button").addEventListener("click", calculateStatistics);
+
+function calculateStatistics() {
+    const dataInput = document.getElementById("data-input").value;
+    const resultsDiv = document.getElementById("results");
+    
+    // Split input into an array of numbers
+    const data = dataInput.split(",").map(num => parseFloat(num.trim())).filter(num => !isNaN(num));
+    
+    if (data.length === 0) {
+        resultsDiv.innerHTML = "Please enter valid numbers.";
+        resultsDiv.style.display = "block";
+        return;
+    }
+    
+    const mean = calculateMean(data);
+    const median = calculateMedian(data);
+    const mode = calculateMode(data);
+    const stdDev = calculateStandardDeviation(data, mean);
+
+    resultsDiv.innerHTML = `
+        <div class="result">Mean: ${mean.toFixed(2)}</div>
+        <div class="result">Median: ${median}</div>
+        <div class="result">Mode: ${mode.join(", ")}</div>
+        <div class="result">Standard Deviation: ${stdDev.toFixed(2)}</div>
+    `;
+    resultsDiv.style.display = "block"; // Show results
+}
+
+// Function to calculate Mean
+function calculateMean(data) {
+    const sum = data.reduce((a, b) => a + b, 0);
+    return sum / data.length;
+}
+
+// Function to calculate Median
+function calculateMedian(data) {
+    data.sort((a, b) => a - b);
+    const mid = Math.floor(data.length / 2);
+    return data.length % 2 === 0 ? (data[mid - 1] + data[mid]) / 2 : data[mid];
+}
+
+// Function to calculate Mode
+function calculateMode(data) {
+    const frequency = {};
+    let maxFreq = 0;
+    let modes = [];
+
+    data.forEach(num => {
+        frequency[num] = (frequency[num] || 0) + 1;
+        if (frequency[num] > maxFreq) {
+            maxFreq = frequency[num];
+        }
+    });
+
+    for (const num in frequency) {
+        if (frequency[num] === maxFreq) {
+            modes.push(num);
+        }
+    }
+
+    return modes.length === Object.keys(frequency).length ? [] : modes; // Return empty array if all numbers occur equally
+}
+
+// Function to calculate Standard Deviation
+function calculateStandardDeviation(data, mean) {
+    const variance = data.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / data.length;
+    return Math.sqrt(variance);
+}
+
+    </script>
+</body>
+</html>
